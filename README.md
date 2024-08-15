@@ -76,32 +76,32 @@ UPLOAD_DIR=./uploads
 ...
 ```
 
-## Authentication - Azure SSO
+## Authentication - Microsft Entra ID (Microsoft SSO)
 
-Refer to [this guide](https://next-auth.js.org/providers/azure-ad) for more info.
+Refer to [this page](https://authjs.dev/reference/core/providers/microsoft-entra-id#setup) for more info.
 
-Sign up to Azure with your Imperial Microsoft single sign-on. Make sure to do this through the [student sign up page](https://azure.microsoft.com/en-gb/free/students/).
+Login to the [Entra Admin Center](https://entra.microsoft.com/#home).
 
-In the Azure portal, head to the [Entra ID page](https://portal.azure.com/#view/Microsoft_AAD_IAM/ActiveDirectoryMenuBlade). Under the overview, click “Add”, then click “App registration”.
+In the Entra Admin Center, head to the [App Registrations page](https://entra.microsoft.com/#view/Microsoft_AAD_RegisteredApps/ApplicationsListBlade/quickStartType~/null/sourceType/Microsoft_AAD_IAM) (Applications > App registrations in the sidebar). In the toolbar at the top, select “New registration”.
 
 Fill in the name of your app and select your desired supported account types. If in doubt, select “Accounts in this organizational directory only”.
 
-For the redirect URI, select the “Web” platform, and enter [`http://localhost:3000/api/auth/callback/azure-ad`](http://localhost:3000/api/auth/callback/azure-ad) as the address.
+For the redirect URI, select the “Web” platform, and enter [`http://localhost:3000/api/auth/callback/microsoft-entra-id`](http://localhost:3000/api/auth/callback/microsoft-entra-id) as the address.
 
-Confirm the details and you will be redirected to your app’s Active Directory page which contains some IDs.
+Confirm the details and you will be redirected to your app’s Entra ID App Registration page which contains some IDs.
 
 In your project’s `.env` file, set:
 
-- `AZURE_AD_CLIENT_ID` to the “Application (client) ID”
-- `AZURE_AD_TENANT_ID` to the “Directory (tenant) ID”
+- `MS_ENTRA_CLIENT_ID` to the “Application (client) ID”
+- `MS_ENTRA_TENANT_ID` to the “Directory (tenant) ID”
 
-From the app’s Active Directory page, navigate to “Certificates & secrets”, then click on “New client secret”. Enter any description and leave the expiration as 6 months (Note: this means you will have to generate a new client secret in 6 months’ time). Click “Add”.
+From the app’s Entra ID App Registration, navigate to “Certificates & secrets”, then click on “New client secret”. Enter any description and leave the expiration as 6 months (Note: this means you will have to generate a new client secret in 6 months’ time). Click “Add”.
 
-Copy the value from the secret into the `AZURE_AD_CLIENT_SECRET` row in the `.env` file.
+Copy the value from the secret into the `MS_ENTRA_CLIENT_SECRET` row in the `.env` file.
 
 ## Running Locally
 
-Assuming you’ve, make a copy of `.env.template` as `.env`  and filled it in as required, you can start the app as follows:
+Assuming you’ve make a copy of `.env.template` as `.env`  and filled it in as required (read the comments), you can start the app as follows:
 
 ```bash
 npm run dev
@@ -193,9 +193,17 @@ The environment variables relating to MySQL do not have to be changed as this is
 
 ## Adding SSO Authentication
 
-Follow the instructions in the development guide above to add SSO Authentication.
+Follow the instructions in the development guide above to add SSO Authentication. However, instead of setting the environment variables in the `.env` file, set them in the ImPaaS environment:
 
-Add an additional redirectURI in the Azure portal with platform “Web” and address `https://<APP_NAME>.impaas.uk/api/auth/callback/azure-ad`.
+```bash
+impaas env set \
+	MS_ENTRA_CLIENT_ID=<CLIENT_ID> \
+	MS_ENTRA_CLIENT_SECRET=<CLIENT_SECRET> \
+	MS_ENTRA_TENANT_ID=<TENANT_ID> \
+	--app <APP_NAME>
+```
+
+Add an additional redirectURI in the Entra ID portal with platform “Web” and address `https://<APP_NAME>.impaas.uk/api/auth/callback/microsoft-entra-id`.
 
 ## Deploying
 
